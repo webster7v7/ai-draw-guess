@@ -13,7 +13,7 @@ export default function AiDrawGame() {
   const [aiSvg, setAiSvg] = useState<string>('');
   const [mysteryWord, setMysteryWord] = useState<string>('');
   const [userGuessInput, setUserGuessInput] = useState('');
-  const [gameStatus, setGameStatus] = useState<'idle' | 'drawing' | 'guessing' | 'success' | 'failed'>('idle');
+  const [gameStatus, setGameStatus] = useState<'idle' | 'drawing' | 'guessing' | 'success' | 'failed' | 'gave_up'>('idle');
   const [hintLevel, setHintLevel] = useState(0);
   const [toast, setToast] = useState<{ msg: string; type: ToastType; show: boolean }>({ msg: '', type: 'info', show: false });
   const inputRef = useRef<HTMLInputElement>(null);
@@ -139,7 +139,7 @@ export default function AiDrawGame() {
         </div>
       )}
 
-      {(gameStatus === 'guessing' || gameStatus === 'success' || gameStatus === 'failed') && (
+      {(gameStatus === 'guessing' || gameStatus === 'success' || gameStatus === 'failed' || gameStatus === 'gave_up') && (
         <div className="flex flex-col items-center w-full gap-6">
             {/* Drawing Container */}
             <div className="w-full aspect-square max-w-[400px] bg-white border-2 border-gray-100 rounded-2xl shadow-sm p-4 flex items-center justify-center relative overflow-hidden group">
@@ -237,15 +237,31 @@ export default function AiDrawGame() {
                                 Try Again
                             </button>
                             <button 
-                                onClick={() => {
-                                    showToast(`The word was ${mysteryWord}`, 'info');
-                                    setGameStatus('idle');
-                                }}
+                                onClick={() => setGameStatus('gave_up')}
                                 className="py-3 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl font-bold transition-colors"
                             >
                                 Give Up
                             </button>
                         </div>
+                    </div>
+                )}
+
+                {gameStatus === 'gave_up' && (
+                    <div className="p-6 bg-gray-50 text-gray-900 rounded-3xl text-center border border-gray-200 animate-in zoom-in duration-300 shadow-sm relative overflow-hidden">
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-gray-500">
+                            <Bot size={32} />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 text-gray-800">Game Over</h3>
+                        <p className="text-lg text-gray-600 mb-6">
+                            The word was <span className="font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">{mysteryWord}</span>
+                        </p>
+                        <button 
+                            onClick={startAiDrawGame}
+                            className="w-full py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-bold shadow-lg hover:shadow-indigo-500/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                        >
+                            <RefreshCw size={20} />
+                            Play Again
+                        </button>
                     </div>
                 )}
             </div>
